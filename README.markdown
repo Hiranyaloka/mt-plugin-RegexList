@@ -1,4 +1,4 @@
-# REGEXLIST 0.11 FOR MOVABLE TYPE 4, 5, AND MELODY #
+# REGEXLIST 0.12 FOR MOVABLE TYPE 4, 5, AND MELODY #
 
 Sometimes you may think that a regular expression is the best way to solve your problem. And you are probably wrong. But hey, I'm not here to judge. In fact, I've just cooked up a big chunk of Regex Crack for you, which I've named instead  `RegexList` so you won't scare off any clients.
 

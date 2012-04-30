@@ -8,12 +8,6 @@ package RegexList::Plugin;
 use strict;
 use MT 4;
 
-=head2 Text Filter - regex_list
-The regex_list modifier takes four arguments. The first argument is a regular expression which acts globally on the tag's text and stores the matches in an array. The second argument and third arguments are essentially a regex_replace modifier, acting sequentially on each item in the previously matched array.
-
-The first regex only stores the first match.
-=cut
-
 sub regex_list {
   my ( $str, $val, $ctx ) = @_;
   my $app = MT->app;
