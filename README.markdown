@@ -27,23 +27,23 @@ The `regex_replace` modifier will allow us to _replace_ all our bookmarks with l
 
     /<a name=(['"])(.+?)\1>(.*?)</a>/i
 
-The first parenthesis captures the first quotes (single or double), and the backreference `\1` repeats that. The second and third parenthesis captures the required link name and the optional anchor text. We'll be using `\2` and `\3` backreferences to place those bits in our replacement argument. The `g` modifier means we are searching globally (we want all such links) and the `i` modifier gives us case insensitivity.
+The first parenthesis captures the first quotes (single or double), and the backreference `\1` repeats that. The second and third parenthesis captures the required link name and the optional anchor text. We'll be using `\2` and `\3` backreferences to place those bits in our replacement argument. The `i` modifier gives us case insensitivity.
 
-Her's what the bookmark link will look like:
+The bookmark link will look like this:
 
     <a href="#sliders">White Castle Hamburgers</a>
 
-The replacement argument is simple. We just fill in the variable bits with the backreferences. Since this isn't a regex, we don't need to escape 
+The replacement argument is simple. We just fill in the variable bits with the backreferences. Since this isn't a regex, we don't need to escape special characters.
 
     <a href="#$2">$3</a>
 
 (Don't forget, backreferences within the regex start with a backslash `\1`, whereas backreferences in the replacement argument use the dollar sign `$1`.)
 
-The third argument is the key to RegexList's power. Instead of operationg on the text in place, we provide the modifier with a second regex to match and extract the substrings first. Again, this is the third argument, but logically it is the first step in the algorithm. This regex will likely look very much like the first regex. The key difference is that we don't bother to capture the variable bits:
+The third argument is the key to RegexList's power. Instead of operating on the text in place, we provide the modifier with a second regex to match and extract the substrings first. Again, this is the third argument, but logically it is the first step in the algorithm. This regex will likely look very much like the first regex. The key difference is that we don't bother to capture the variable bits:
 
     /(<a name=(['"]).+?\2>.*?</a>)/i
 
-That regex is used soley to gather the substrings, and pass them to the "regex_replace" function created fromn the first two arguments. The second regex (third argument) is always global. You can put the `g` modifier there or not, but the expression is processed globally. Because that is the point of the modifier.
+That regex is used soley to gather the substrings, and pass them to the "regex_replace" function created from the first two arguments. The second regex (third argument) is always global. You can put the `g` modifier there or not, but the expression is processed globally. Because that is the purpose of the plugin.
 
 ###  PUTTING  IT TOGETHER ###
 
@@ -53,9 +53,9 @@ You now have your three arguments, this is what that will look like inside the P
 
 We are going to feed the tag modifier output into a Movable Type variable `pagelinks`. The variable will be an array. More on that later, let's fill in the arguments:
 
-    <mt:PageBody regex_list="/<a name=(['"])(.+?)\1>(.*?)</a>/i","<a href="#$2">$3</a>","<mt:PageBody regex_list="","","" setvar="pagelinks">" setvar="pagelinks">
+    <mt:PageBody regex_list="/<a name=(['"])(.+?)\1>(.*?)</a>/i","<a href="#$2">$3</a>","/(<a name=(['"]).+?\2>.*?</a>)/i" setvar="pagelinks">
 
-That is an ugly beast, no doubt. But it packs a wallop. BTW, that is not your actual `PageBody` tag, you call a separate one for the sole purpose of generating the list. Now let's see how you make a nice list of links from that.
+That is an ugly beast, no doubt. But it packs a wallop. BTW, that is not your actual `PageBody` tag, you call a separate one for the sole purpose of generating the list. Because you use `setvar` to set the array variable, the tag produces no output. Now let's see how you make a nice list of links from that.
 
    
 
@@ -73,7 +73,7 @@ We can place the list code anywhere on the page after the variable was created:
 
 And you are done!!!
 
-## THE FOURTH ARGUMENT ##
+## THE OPTIONAL FOURTH ARGUMENT ##
 By default, the substring matched by the third argument is stored in its entirety into the array to be "regex-replaced". In technical terms we have captured using the `$&` capture variable. That should be the most common case. But suppose that you don't want to match the entire string that was required in the regex. You have total control merely by specifying the capture portion as a digit from 1 to 9. As an example, say that you only wanted to match image links that were associated with a certain parent structure. This would be your third argument:
 
     /<span class="hot">(<img src=.*?\/>)</span>/
@@ -81,7 +81,7 @@ By default, the substring matched by the third argument is stored in its entiret
 In the above case, we would want to set the fourth argument to "1", meaning that we only wish to capture the image tag (which is contained by the first capturing parentheses).
 
 ## LOGGING ##
-T0 aid in development of your regular expressions, the `regex_list` modifier logs each time that a regular expression matches. I will create a configuration setting to turn logging on and off.
+TO aid in development of your regular expressions, the `regex_list` modifier logs each time that a regular expression matches. I will create a configuration setting to turn logging on and off.
 
 ## ROADMAP ##
 - Configuration setting to turn off logging of regex matches.
