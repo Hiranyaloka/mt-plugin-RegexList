@@ -4,13 +4,13 @@ Sometimes you may think that a regular expression is the best way to solve your 
 
 RegexList is a simple but powerful tag modifier.  With it you can match substrings within your text (with a regex match), then process those substrings further with a second regex replacement, and finally _save those modified substrings into a Movable Type array for template consumption_.
 
-Powerful comes at a price.The RegexList modifier has four arguments! The first two arguments are **EXACTLY** the same in form as the built-in modifier [regex_replace](http://www.movabletype.org/documentation/appendices/modifiers/regex-replace.html):
+Power comes at a price.The RegexList modifier has up to four arguments! The first two arguments are **EXACTLY** the same in form as the built-in modifier [regex_replace](http://www.movabletype.org/documentation/appendices/modifiers/regex-replace.html) .
 
 ## REGEXLIST ARGUMENTS ##
 1. The first regex targets the matched substrings (exactly like argument one of `regex_replace`).
 2. The second argument is the replacement regex expression (exactly like argument two of `regex_replace`).
-3. The third regex matches the substrings only, no capturing parenthesis necessary. It only provides the substrings.
-4. The fourth argument is optional, being a digit from 1 to 9. I'll explain this later.
+3. The third regex matches the substrings only, no capturing parenthesis necessary. It only "feeds" the substrings to the regex_replace function.
+4. The fourth argument is optional, being a digit from 1 to 9. I'll [explain this later](#arg4).
 
 The plugin processes the arguments in order of 3 -> 1 -> 2, but I decided to build on the order of the existing `regex_replace` modifier, for familiarity sake, and also because I plan to make `regex_replace` function the default when the third argument is left off.
 
@@ -27,7 +27,9 @@ The `regex_replace` modifier will allow us to _replace_ all our bookmarks with l
 
     /<a name=(['"])(.+?)\1>(.*?)</a>/i
 
-The first parenthesis captures the first quotes (single or double), and the backreference `\1` repeats that. The second and third parenthesis captures the required link name and the optional anchor text. We'll be using `\2` and `\3` backreferences to place those bits in our replacement argument. The `i` modifier gives us case insensitivity.
+The first parenthesis captures the first quotes (single or double), and the backreference `\1` repeats that. The second and third parenthesis captures the required link name and the optional anchor text. We'll be using `$2` and `$3` backreferences to place those bits in our replacement argument. The `i` modifier gives us case insensitivity.
+
+(Please note that if you expect extra spaces in your page bookmarks, you'll want to toss in some `\s*` space metacharacters.)
 
 The bookmark link will look like this:
 
@@ -73,6 +75,7 @@ We can place the list code anywhere on the page after the variable was created:
 
 And you are done!!!
 
+<a name="arg4"></a>
 ## THE OPTIONAL FOURTH ARGUMENT ##
 By default, the substring matched by the third argument is stored in its entirety into the array to be "regex-replaced". In technical terms we have captured using the `$&` capture variable. That should be the most common case. But suppose that you don't want to match the entire string that was required in the regex. You have total control merely by specifying the capture portion as a digit from 1 to 9. As an example, say that you only wanted to match image links that were associated with a certain parent structure. This would be your third argument:
 
@@ -80,12 +83,15 @@ By default, the substring matched by the third argument is stored in its entiret
     
 In the above case, we would want to set the fourth argument to "1", meaning that we only wish to capture the image tag (which is contained by the first capturing parentheses).
 
+I may extend the optional fourth argument to include multi-digit integers. So for example `42` would mean indicate to concantenate the fourth and second capture before passing to the regex_replace function. OMG, that suggests yet a **fifth** argument, which would be the "glue" between the captured chunks. Yes, five arguments, but that's it, I promise absolutely no more than five, ever.
+
 ## LOGGING ##
 TO aid in development of your regular expressions, the `regex_list` modifier logs each time that a regular expression matches. I will create a configuration setting to turn logging on and off.
 
 ## ROADMAP ##
 - Configuration setting to turn off logging of regex matches.
 - Make the modifier work just like `regex_replace` when only two arguments are used.
+- Extend the fourth argument to multiple digits (captures), and add a fifth "glue" argument.
 - Provide more example regexes.
 - Improve error handling.
 - Localization
