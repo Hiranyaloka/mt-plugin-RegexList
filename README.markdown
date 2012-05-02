@@ -83,7 +83,7 @@ By default, the substring matched by the third argument is stored in its entiret
     
 In the above case, we would want to set the fourth argument to "1", meaning that we only wish to capture the image tag (which is contained by the first capturing parentheses).
 
-I may extend the optional fourth argument to include multi-digit integers. So for example `42` would mean indicate to concantenate the fourth and second capture before passing to the regex_replace function. OMG, that suggests yet a **fifth** argument, which would be the "glue" between the captured chunks. Yes, five arguments, but that's it, I promise absolutely no more than five, ever.
+I may extend the optional fourth argument to include multi-digit integers. So for example `42` would indicate to concantenate the fourth and second capture before passing to the regex_replace function. That suggests yet a **fifth** argument, which would be the "glue" between the captured chunks. Yes, five arguments, but that's it, I promise absolutely no more than five, ever.
 
 ## LOGGING ##
 TO aid in development of your regular expressions, the `regex_list` modifier logs each time that a regular expression matches. I will create a configuration setting to turn logging on and off.
