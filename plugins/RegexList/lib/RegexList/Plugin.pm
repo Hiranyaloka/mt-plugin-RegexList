@@ -21,8 +21,8 @@ sub regex_list {
   my $match_patt  = $val->[2];
   my $capture     = $val->[3];
   
-  # Restrict $capture to single-digit or default is &
-  $capture = $capture =~ /^\s*(\d)\s*/;
+  # Restrict $capture to single non-zero digit or default is &
+  $capture = $capture =~ /^\s*([1-9])\s*/;
   $capture = ($capture || '&');
   
   #store match from first regex into an array
