@@ -89,14 +89,14 @@ So if we replace the `regex_list` line like this (keeping the other six lines th
 
     <$mt:Var name="thestring" regex_list="/(.)(.+)/","\u$1\L$2\E","/([^,]+)/" setvar="thelist"$>
 
-Then the end result is changed:
+Briefly, we have split the first regex match argument into two captures. The first captures only the first character, and the second captures the rest. We then uppercase `$1` and lowercase `$2` in the second argument. The end result is changed:
 
 - Foo
 - Bar
 - Bla
 - Baz
 
-Pretty cool, yeh?
+Pretty cool, yeh? There is no end to the manipulations made possible by the regex_list modifier, due to the inherent power of perl regular expressions. Next we will do somethin a bit more useful.
 
 ## BUILD AN AUTOMATIC TABLE OF CONTENTS FROM PAGE BODY TEXT ##
 
