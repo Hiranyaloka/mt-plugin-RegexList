@@ -46,7 +46,7 @@ Let's break down the first argument (again, this is just standard perl regex syn
 
     /         # start the expression
      (        # start the capture
-      .       # capture anything
+      .       # match anything
        +      #   one or more times
         )     # end the capture
          /    # end the expression
@@ -83,7 +83,7 @@ So we can match substrings (with the third argument) and pass them basically unt
 
 `\u` and `\l` prefixes force the subsequent character to be uppercase or lowercase, respectively.
 
-'\U' and `\L` spans forces the subsequent character(s) to be upper- or lowercased, respectively, until they reach a new case-fold, or until they are terminated by a `\E`.
+`\U` and `\L` spans forces the subsequent character(s) to be upper- or lowercased, respectively, until they reach a new case-fold, or until they are terminated by a `\E`.
 
 So if we replace the `regex_list` line like this (keeping the other six lines the same):
 
