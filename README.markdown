@@ -15,15 +15,98 @@ Power comes at a price.The RegexList modifier has up to four arguments! The firs
 The plugin processes the arguments in order of 3 -> 1 -> 2, but I decided to build on the order of the existing `regex_replace` modifier, for familiarity sake, and also because I plan to make `regex_replace` function the default when the third argument is left off.
 
 ## WHO THIS  PLUGIN IS FOR ##
-You will either need to know a good bit about regular expressions, or know someone who does, in order to take full advantage of this plugin.
+You will either need to know a good bit about regular expressions, or know someone who does, in order to take full advantage of this plugin. We'll first examine a simple use case, breaking down the logic for clarity.
 
-## JUST SHOW ME AN EXAMPLE ##
+## A VERY SIMPLE EXAMPLE: SPLIT A STRING INTO A LIST ##
 
-Let's start with a simple example. I have a bunch of page anchors in the page body, and I'd like create an automated widget for linking to them from the sidebar. Here's the general format for the "bookmarks":
+Let us start simply, explaining each step in detail. We'll start with a string:
+
+    <$mt:Var name="thestring" value="FOO,bar,bLA,Baz"$>
+    
+Although that value looks like a list, to Movable Type it is a simple string variable. We have assigned a string to a Movable Type variable, just to have something to work with.
+
+Now we will use the `regex_list` modifier to parse the string, capturing the individual words. In order to do this, we must use a regular expression to match only the words, not the comma. The third argument is always the regular expression that matches the substrings, so focus on that for now:
+
+    <$mt:Var name="thestring" regex_list="","","/([^,]+)/" setvar="thelist"$>
+
+The regular expression breaks down like this (this is just standard perl regex syntax):
+
+    /          # start the regular expression
+     [^,]      # match any character that is not a comma
+         +     #   one or more times
+           /   # end the regular expression
+
+We are searching through the string from left to right, matching chunks of string as we go. Notice that the regular expression placed in the third argument is always global, so you don't have to use the global modifier `/my_regex/g`. Also note that we are capturing the entire matched substring by default (more on that later).
+
+OK, so the third argument should have matched four substrings from our original comma-separated value. Those four values are each separately passed to the `regex_replace` function, which is handled by arguments one and two. But for simplicity, let us say that we don't care to further process the substrings. Let's pass them right into the "thelist" array variable. Here's one way to do that, starting with the first argument:
+
+    <$mt:Var name="thestring" regex_list="/(.+)/","","" setvar="thelist"$>
+    
+Let's break down the first argument (again, this is just standard perl regex syntax):
+
+    /         # start the expression
+     (        # start the capture
+      .       # capture anything
+       +      #   one or more times
+        )     # end the capture
+         /    # end the expression
+
+So we are not really filtering, except that the word must be at least one character. That is the "regex" part of the "regex_replace" function. Note that the capturing parenthesis are critical. Without them, we may have matched something, but we have captured nothing. Using the parenthesis we can match all or parts of the matched string.
+
+The second argument is the "replace" function:
+
+    <$mt:Var name="thestring" regex_list="","$1","" setvar="thelist"$>
+
+The variable `$1` simply refers to the everything captured in the (first) parenthesis of the first argument. The combined result is that we are merely passing on the substrings matched by the third argument regex. The end result of the sequence, is a simple "split on comma" function. Now put it together:
+
+    <$mt:var name="thestring" value="FOO,bar,bLA,Baz"$>
+    <$mt:Var name="thestring" regex_list="/(.+)/","$1","/([^,]+)/" setvar="thelist"$>
+
+We can now use our new array variable:
+
+    <ul>
+    <mt:Loop name="thelist">
+    <li><mt:Var name="__value__"></li>
+    </mt:Loop>
+    </ul>
+
+Those seven lines will output the following:
+
+- FOO
+- bar
+- bLA
+- Baz
+
+## NEXT STEP: PROCESS OUR MATCHED WORDS ##
+
+So we can match substrings (with the third argument) and pass them basically untouched into a MT array variable. Pretty nice, but let's leverage the regex_replace function provided by arguments one and two. Let's clean up the capitalization with case-folding prefixes and case-folding spans. A quick review of case-folding in perl regular expressions:
+
+`\u` and `\l` prefixes force the subsequent character to be uppercase or lowercase, respectively.
+
+'\U' and `\L` spans forces the subsequent character(s) to be upper- or lowercased, respectively, until they reach a new case-fold, or until they are terminated by a `\E`.
+
+So if we replace the `regex_list` line like this (keeping the other six lines the same):
+
+    <$mt:Var name="thestring" regex_list="/(.)(.+)/","\u$1\L$2\E","/([^,]+)/" setvar="thelist"$>
+
+Then the end result is changed:
+
+- Foo
+- Bar
+- Bla
+- Baz
+
+Pretty cool, yeh?
+
+## BUILD AN AUTOMATIC TABLE OF CONTENTS FROM PAGE BODY TEXT ##
+
+We will now create an automated widget for linking to page bookmarks. We would start by manually placing bookmarks above each of our main page sections (e.g. above the h2 headings). Here's the general format for these "bookmarks":
 
     <a name="sliders">White Castle Hamburgers</a>
 
-The `regex_replace` modifier will allow us to _replace_ all our bookmarks with links. That's not very useful in itself, but follow along and you'll see why we want to do that. Here's the "regex" half of the "regex_replace" modifier:
+The challenge is to match each of these bookmarks in a page, and create a list of links to each of the bookmarks.
+
+The builtin `regex_replace` modifier will allow us to _replace_ all our bookmarks with links. That's not very useful in itself, but follow along and you'll see why we want to do that. Here's the "regex" half of the "regex_replace" modifier:
 
     /<a name=(['"])(.+?)\1>(.*?)</a>/i
 
@@ -45,7 +128,7 @@ The third argument is the key to RegexList's power. Instead of operating on the 
 
     /(<a name=(['"]).+?\2>.*?</a>)/i
 
-That regex is used soley to gather the substrings, and pass them to the "regex_replace" function created from the first two arguments. The second regex (third argument) is always global. You can put the `g` modifier there or not, but the expression is processed globally. Because that is the purpose of the plugin.
+That regex is used soley to gather the substrings, and pass them to the "regex_replace" function created from the first two arguments. As stated earlier, the second regex (third argument) is always global. You can put the `g` modifier there or not, but the expression is processed globally.
 
 ###  PUTTING  IT TOGETHER ###
 
@@ -83,7 +166,7 @@ By default, the substring matched by the third argument is stored in its entiret
     
 In the above case, we would want to set the fourth argument to "1", meaning that we only wish to capture the image tag (which is contained by the first capturing parentheses).
 
-I may extend the optional fourth argument to include multi-digit integers. So for example `42` would indicate to concantenate the fourth and second capture before passing to the regex_replace function. That suggests yet a **fifth** argument, which would be the "glue" between the captured chunks. Yes, five arguments, but that's it, I promise absolutely no more than five, ever.
+I may (in future releases) extend the optional fourth argument to include multi-digit integers. So for example `42` would indicate to concantenate the fourth and second capture before passing to the regex_replace function. That suggests yet a **fifth** argument, which would be the "glue" between the captured chunks. Yes, five arguments, but that's it, I promise absolutely no more than five, ever.
 
 ## LOGGING ##
 TO aid in development of your regular expressions, the `regex_list` modifier logs each time that a regular expression matches. I will create a configuration setting to turn logging on and off.
