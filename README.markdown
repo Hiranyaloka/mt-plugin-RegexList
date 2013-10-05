@@ -112,7 +112,7 @@ The builtin `regex_replace` modifier will allow us to _replace_ all our bookmark
 
 The first parenthesis captures the first quotes (single or double), and the backreference `\1` repeats that. The second and third parenthesis captures the required link name and the optional anchor text. We'll be using `$2` and `$3` backreferences to place those bits in our replacement argument. The `i` modifier gives us case insensitivity.
 
-(Please note that if you expect extra spaces in your page bookmarks, you'll want to toss in some `\s*` space metacharacters.)
+(Please note that if you expect extra spaces in your page bookmarks, you'll want to toss in some `\s*` space metacharacters. Also, note that forward slashes within the regexesdo not need escaping as they would in perl code.)
 
 The bookmark link will look like this:
 
@@ -162,7 +162,7 @@ And you are done!!!
 ## THE OPTIONAL FOURTH ARGUMENT ##
 By default, the substring matched by the third argument is stored in its entirety into the array to be "regex-replaced". In technical terms we have captured using the `$&` capture variable. That should be the most common case. But suppose that you don't want to match the entire string that was required in the regex. You have total control merely by specifying the capture portion as a digit from 1 to 9. As an example, say that you only wanted to match image links that were associated with a certain parent structure. This would be your third argument:
 
-    /<span class="hot">(<img src=.*?\/>)<\/span>/
+    /<span class="hot">(<img src=.*?/>)</span>/
     
 In the above case, we would want to set the fourth argument to "1", meaning that we only wish to capture the image tag (which is contained by the first capturing parentheses).
 
