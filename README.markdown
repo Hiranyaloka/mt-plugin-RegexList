@@ -162,7 +162,7 @@ And you are done!!!
 ## THE OPTIONAL FOURTH ARGUMENT ##
 By default, the substring matched by the third argument is stored in its entirety into the array to be "regex-replaced". In technical terms we have captured using the `$&` capture variable. That should be the most common case. But suppose that you don't want to match the entire string that was required in the regex. You have total control merely by specifying the capture portion as a digit from 1 to 9. As an example, say that you only wanted to match image links that were associated with a certain parent structure. This would be your third argument:
 
-    /<span class="hot">(<img src=.*?\/>)</span>/
+    /<span class="hot">(<img src=.*?\/>)<\/span>/
     
 In the above case, we would want to set the fourth argument to "1", meaning that we only wish to capture the image tag (which is contained by the first capturing parentheses).
 
